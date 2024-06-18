@@ -6,10 +6,12 @@ PKG_RELEASE:=1
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/mypackage
-    SECTION:=net
-    CATEGORY:=Network
-    TITLE:=My custom OpenWRT package
+define Package/luci-app-showshow
+    SECTION:=luci
+    CATEGORY:=Luci
+    SUBMENU:=3. Applications
+    TITLE:= song~s
+    PKGARCH:=all
     MAINTAINER:=Your Name <3014602014@qq.com>
 endef
 

@@ -1,0 +1,9 @@
+Package: my-package
+Version: 1.0-1
+Depends: libc, uhttpd, uci
+Source: none
+Section: base
+Priority: optional
+Architecture: all
+Maintainer: Your Name <youremail@example.com>
+Description: My custom OpenWRT package

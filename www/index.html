@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenWRT 系统状态</title>
+    <style>
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 20px;
+            background-color: #800080;
+            text-align: right;
+            padding-right: 5px;
+            color: white;
+            width: 0;
+            border-radius: 10px;
+        }
+        .status {
+            font-weight: bold;
+        }
+        .connected {
+            color: green;
+        }
+        .disconnected {
+            color: red;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        .input-group label {
+            display: inline-block;
+            width: 120px;
+        }
+        .input-group input[type="text"],
+        .input-group input[type="password"] {
+            width: 200px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+        .input-group button {
+            padding: 5px 10px;
+            border: none;
+            background-color: #4b0082;
+            color: white;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        #detect-toggle {
+            padding: 10px 20px;
+            border: none;
+            background-color: #800080;
+            color: white;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>系统状态</h1>
+    <div>
+        <h3>CPU 使用率</h3>
+        <div class="progress-bar">
+            <div id="cpu-usage" class="progress-bar-fill"></div>
+        </div>
+    </div>
+    <div>
+        <h3>内存使用率</h3>
+        <div class="progress-bar">
+            <div id="memory-usage" class="progress-bar-fill"></div>
+        </div>
+    </div>
+    <div>
+        <h3>上传速度</h3>
+        <div id="upload-speed">0 KB/s</div>
+    </div>
+    <div>
+        <h3>下载速度</h3>
+        <div id="download-speed">0 KB/s</div>
+    </div>
+    <div>
+        <h3>连接状态</h3>
+        <div id="baidu-status" class="status">百度：检查中...</div>
+        <div id="google-status" class="status">谷歌：检查中...</div>
+        <div id="device-count" class="status">连接设备数量：0</div>
+    </div>
+    <div>
+        <h3>WiFi 设置</h3>
+        <div class="input-group">
+            <label for="wifi24-name">2.4GWiFi名称：</label>
+            <input type="text" id="wifi24-name">
+            <button onclick="updateWiFi('wifi24', 'name')">更新名称</button>
+        </div>
+        <div class="input-group">
+            <label for="wifi24-password">2.4GWiFi密码：</label>
+            <input type="password" id="wifi24-password">
+            <button onclick="updateWiFi('wifi24', 'password')">更新密码</button>
+        </div>
+        <div class="input-group">
+            <label for="wifi5-name">5G WiFi 名称：</label>
+            <input type="text" id="wifi5-name">
+            <button onclick="updateWiFi('wifi5', 'name')">更新名称</button>
+        </div>
+        <div class="input-group">
+            <label for="wifi5-password">5G WiFi 密码：</label>
+            <input type="password" id="wifi5-password">
+            <button onclick="updateWiFi('wifi5', 'password')">更新密码</button>
+        </div>
+    </div>
+    <div>
+        <button id="detect-toggle" onclick="toggleDetect()">开启防检测</button>
+    </div>
+
+    <script>
+        async function fetchStatus() {
+            try {
+                let response = await fetch('/cgi-bin/status');
+                let data = await response.json();
+
+                document.getElementById('cpu-usage').style.width = data.cpu + '%';
+                document.getElementById('cpu-usage').textContent = data.cpu + '%';
+
+                document.getElementById('memory-usage').style.width = data.memory + '%';
+                document.getElementById('memory-usage').textContent = data.memory + '%';
+
+                document.getElementById('upload-speed').textContent = data.upload + ' KB/s';
+                document.getElementById('download-speed').textContent = data.download + ' KB/s';
+
+                const baiduStatus = document.getElementById('baidu-status');
+                const googleStatus = document.getElementById('google-status');
+                const deviceCount = document.getElementById('device-count');
+
+                if (data.baidu === 'Connected') {
+                    baiduStatus.classList.remove('disconnected');
+                    baiduStatus.classList.add('connected');
+                    baiduStatus.textContent = '百度：已连接';
+                } else {
+                    baiduStatus.classList.remove('connected');
+                    baiduStatus.classList.add('disconnected');
+                    baiduStatus.textContent = '百度：未连接';
+                }
+
+                if (data.google === 'Connected') {
+                    googleStatus.classList.remove('disconnected');
+                    googleStatus.classList.add('connected');
+                    googleStatus.textContent = '谷歌：已连接';
+                } else {
+                    googleStatus.classList.remove('connected');
+                    googleStatus.classList.add('disconnected');
+                    googleStatus.textContent = '谷歌：未连接';
+                }
+
+                deviceCount.textContent = '连接设备数量：' + data.device_count;
+            } catch (error) {
+                console.error('获取状态时出错:', error);
+            }
+        }
+
+        function updateWiFi(type, field) {
+            const name = field === 'name' ? document.getElementById(type + '-name').value : null;
+            const password = field === 'password' ? document.getElementById(type + '-password').value : null;
+            fetch('/cgi-bin/update_wifi', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    type: type,
+                    name: name,
+                    password: password
+                })
+            }).then(response => {
+                if (response.ok) {
+                    alert('WiFi 设置更新成功');
+                } else {
+                    alert('WiFi 设置更新失败');
+                }
+            }).catch(error => {
+                console.error('更新 WiFi 设置时出错:', error);
+            });
+        }
+
+        function toggleDetect() {
+            const button = document.getElementById('detect-toggle');
+            if (button.textContent === '开启防检测') {
+                button.textContent = '关闭防检测';
+            } else {
+                button.textContent = '开启防检测';
+            }
+        }
+
+        setInterval(fetchStatus, 1000); // 每秒获取一次状态
+    </script>
+</body>
+</html>

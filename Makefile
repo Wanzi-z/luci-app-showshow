@@ -23,7 +23,7 @@ endef
 
 define Package/my-package/install
     $(INSTALL_DIR) $(1)/etc/config
-    $(INSTALL_CONF) $(PKG_BUILD_DIR)/files/etc/config/showshow $(1)/etc/config/showshow
+    $(INSTALL_CONF) $(PKG_BUILD_DIR)/files/etc/config/showshow_package $(1)/etc/config/showshow_package
 
     $(INSTALL_DIR) $(1)/www/cgi-bin
     $(INSTALL_BIN) $(PKG_BUILD_DIR)/files/www/cgi-bin/script.lua $(1)/www/cgi-bin/script.lua

@@ -1,6 +1,6 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=mypackage
+PKG_NAME:=luci-app-showshow
 PKG_VERSION:=1.0
 PKG_RELEASE:=1
 
@@ -12,7 +12,7 @@ define Package/luci-app-showshow
     SUBMENU:=3. Applications
     TITLE:= song~s
     PKGARCH:=all
-    MAINTAINER:=Your Name <3014602014@qq.com>
+    
 endef
 
 define Package/mypackage/description

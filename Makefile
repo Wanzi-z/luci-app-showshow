@@ -15,7 +15,7 @@ define Package/luci-app-showshow
     
 endef
 
-define Package/mypackage/description
+define Package/luci-app-showshow/description
     This package provides a custom web interface for OpenWRT to monitor system status and configure WiFi settings.
 endef
 
@@ -23,7 +23,7 @@ define Build/Compile
     # Nothing to compile
 endef
 
-define Package/mypackage/install
+define Package/luci-app-showshow/install
     $(INSTALL_DIR) $(1)/etc/config
     $(INSTALL_CONF) $(PKG_BUILD_DIR)/files/etc/config/mypackage $(1)/etc/config/mypackage
 

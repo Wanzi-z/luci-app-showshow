@@ -37,4 +37,4 @@ define Package/luci-app-showshow/install
     $(INSTALL_DATA) $(PKG_BUILD_DIR)/files/www/index.html $(1)/www/index.html
 endef
 
-$(eval $(call BuildPackage,mypackage))
+$(eval $(call BuildPackage,luci-app-showshow))

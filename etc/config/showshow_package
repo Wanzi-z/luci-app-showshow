@@ -1,0 +1,2 @@
+config mypackage 'settings'
+    option enabled '0'

@@ -37,6 +37,8 @@ define Package/luci-app-showshow/install
   $(INSTALL_DIR) $(1)/www
   $(INSTALL_DATA) $(PKG_BUILD_DIR)/www/index.html $(1)/www/
   $(INSTALL_DATA) $(PKG_BUILD_DIR)/www/cgi-bin/script.lua $(1)/www/cgi-bin/
+
+  chmod +x $(1)/www/cgi-bin/script.lua
 endef
 
 $(eval $(call BuildPackage,luci-app-showshow))
